@@ -51,11 +51,12 @@
         <div>
             <p>If you are not familiar with JSCS, it is a javascript code style checker. JSCS can be used by the individual developer or by a project lead to enforce coding style for all developer contributions to the project.</p>
 
-<p>I recently became aware of JSCS and its importance while preparing a small and simple pull request for gulp-notify-growl (A gulp package allowing Windows users to use growl notifier). Although my minor code changes were not affected by JSCS, I noticed the project developers use of it and was intrigued because I am a firm believer of enforcing standards.</p>
+<p>I recently became aware of JSCS and its importance while preparing a small and simple pull request for
+ <a href="https://github.com/yannickcr/gulp-notify-growl">gulp-notify-growl</a> (A gulp package allowing Windows users to use <a href="http://www.growlforwindows.com/gfw/">growl</a> notifier). Although my minor code changes were not affected by JSCS, I noticed the project developers use of it and was intrigued because I am a firm believer of enforcing standards.</p>
 
-<p>Yannickcr (the developer of gulp-notify-growl) has an article on his personal website detailing the installation and use of JSCS as a grunt task. https://yannick.cr/posts/enforcing-coding-rules-in-your-team-with-jscs/post . He mentions gulp-jscs in his article.</p>
+<p>Yannickcr (the developer of gulp-notify-growl) has an article on his <a href="https://yannick.cr/posts/enforcing-coding-rules-in-your-team-with-jscs/post">personal website</a> detailing the installation and use of JSCS as a grunt task. He also mentions gulp-jscs in his article.</p>
 
-<p>My goal was to learn how to use both JSCS and JSHint and how to enforce them before other tasks could execute. After some google research and looking at the individual packages gulp-jscs and gulp-jshint this is what I came up with.</p>
+<p>My goal was to learn how to use both JSCS and JSHint and how to enforce them before other tasks could execute. After some google research and looking at the individual packages <a href="https://github.com/sindresorhus/gulp-jscs">gulp-jscs</a> and <a href="https://github.com/wearefractal/gulp-jshint">gulp-jshint</a> this is what I came up with.</p>
 
 <p>First let's build a simple test project.</p>
 
@@ -68,23 +69,23 @@
     gulpfile.js
 </code></pre>
 
-<p>You can use <code>npm init</code> to create your package.json or you can just create it manually containing only the opening and closing curly braces. If you don't have at least the open and close curly braces you will get a parsing error when trying to install packages from the cli. Of course if you use <code>npm-init</code> you won't have to worry about this but then you have to answer those interactive cli questions which are not important for this demonstration. So I'll just manually create the file.</p>
+<p>You can use <code>npm init</code> to create your package.json or create an empty one manually. Just be sure to include at least the opening and closing curly braces in it or you will get a parse error from npm when you try to install the required dev dependencies.</p>
 
-<h6>package.json</h6>
+<p>You will need jscs and jshint installed on your system so in the cli execute</p>
 
-<pre><code class="json">{
-}
+<pre><code>npm install -g jscs jshint
 </code></pre>
 
-<p>You will need jscs and jshint installed on your system so in the cli execute
-<code>npm install -g jscs jshint</code></p>
+<p>After those packages finish installing, make sure you are in the root of your test app and execute the following.</p>
 
-<p>After those packages install, make sure you are in the root of your test app and execute the following.
-<code>npm install --save-dev gulp gulp-jscs gulp-jshint jshint-stylish gulp-notify gulp-notify-growl</code></p>
+<pre><code>npm install --save-dev gulp gulp-jscs gulp-jshint jshint-stylish gulp-notify gulp-notify-growl
+</code></pre>
 
-<p>Really, only gulp and gulp-jscs are required but I like using notify. I will demonstrate how to use regular gulp-notify for Mac/Linux users and how to use gulp-notify-growl for Windows users. I also installed jshint-stylish for use later in the lint task.</p>
+<p>Only gulp, gulp-jscs, and gulp-jshint are required but I like notifications. I will demonstrate how to use regular gulp-notify for Mac/Linux users and how to use gulp-notify-growl for Windows users. I also installed jshint-stylish for use later in the lint task.</p>
 
 <p>Your package.json should now look like this</p>
+
+<h6>package.json</h6>
 
 <pre><code class="json">{
   "devDependencies": {
@@ -117,21 +118,21 @@ gulp.task('jscs', function() {
         .pipe(notify({
             title: 'JSCS',
             message: 'JSCS Passed. Let it fly!'
-        }));
+        }))
 
         /* Alternatively for Windows users
         .pipe(notify({
             title: 'JSCS',
             message: 'JSCS Passed. Let it fly!',
             notifier: growlNotifier
-        }));
+        }))
         */
 });
 </code></pre>
 
-<p>We need one more thing for JSCS to work.  <code>.jscs.json</code> is where JSCS will look for the rules you want to enforce. By default JSCS will look in the root of the project for this file.</p>
+<p>We need one more thing for JSCS to work.  <code>.jscs.json</code> is where JSCS will look for the rules you want to enforce. By default JSCS will look in the root of the project for this file. You can also <a href="https://github.com/sindresorhus/gulp-jscs#jscsconfigpath">specify the path to the config file</a> if it is located elsewhere.</p>
 
-<p>I took this file directly from the src of Yannick's gulp-notify-growl package but you can modify it however you like for your own projects.</p>
+<p>I took <a href="https://github.com/yannickcr/gulp-notify-growl/blob/master/.jscs.json">this file</a> directly from the src of Yannick's gulp-notify-growl package but you can modify it however you like for your own projects.</p>
 
 <p>In the root of your project create the file .jscs.json remembering the '.' at the beginning of the file name.</p>
 
@@ -174,7 +175,7 @@ gulp.task('jscs', function() {
 }
 </code></pre>
 
-<p>As you can see Mr. Yannick has a lot of rules defined here but you can be as strict or relaxed as you like. I just took the easy route of using one someone else already put together.</p>
+<p>As you can see Mr. Yannick has a lot of rules defined here but you can be as strict or relaxed as you like. I just took the easy route of using one someone else already put together. For more detail about all the available rules read the <a href="https://github.com/mdevils/node-jscs">node-jscs readme file</a></p>
 
 <p>Now you should be able to run your jscs task but you'll need some code in your app.js file to test.
 For starters I just used this simple code.</p>
@@ -245,15 +246,43 @@ gulp.task('lint', function() {
 });
 </code></pre>
 
-<p>gulp-jshint requires a reporter to be defined. You can use 'jshint-stylish' (requires installation of the jshint-stylish package) or just stick with the 'default' reporter. jshint-stylish works on Windows if you are using a color supporting console emulator such as conemu, and it just looks prettier with colors.</p>
+<p>gulp-jshint requires a reporter to be defined. You can use 'jshint-stylish' (requires installation of the jshint-stylish package) or just stick with the 'default' reporter. jshint-stylish uses colors but seems to be working in cmd.exe though I don't recall installing ansicon. Anyway, if you have problems with it you can always switch to 'default'. It should most definitely work with conemu, console2, or cmder.</p>
 
-<p>gulp-jshint will not fail by default like gulp-jscs does so after reporting you must pipe it through a second reporter with the type set as 'fail'. Just like with gulp-jscs you could catch the error and handle it with your own custom handler but I like that it completely fails when there is a problem.</p>
+<p>gulp-jshint will not fail by default like gulp-jscs does so after reporting you must pipe it through a second reporter with the type set as 'fail'. As with gulp-jscs you could catch the error and handle it with your own custom handler but I like that it completely fails when there is a problem.</p>
+
+<p>Try it out by removing a semi-colon in app.js . When you run <code>gulp lint</code> you should see something like</p>
+
+<pre><code>C:\Users\lotus\projects\jscstestapp\js\app.js
+  line 6   col 7   Missing "use strict" statement.
+  line 10  col 17  Missing semicolon.
+
+2 problems
+</code></pre>
+
+<p>Again followed by that ugly stacktrace. This should fix everything and you should be able to pass both lint and jscs tasks.</p>
+
+<h6>app.js</h6>
+
+<pre><code class="javascript">'use strict';
+
+var Person = {
+  firstName : 'Fred',
+  sayName : function() {
+      console.log('Hello, my name is ' + this.firstName);
+    }
+};
+
+Person.sayName();
+
+</code></pre>
+
+<p>You may get more errors from jscs on indentation because the rules are very strict but when everything is just right, both tasks will pass.</p>
 
 <h3>Enforcing JSCS and JShint before build or deploy tasks</h3>
 
 <p>Lets say you are using gulp-git to commit changes to the repository or you have a custom build or deploy task and you want to make sure JSCS and JSHint tests pass before this task will run.</p>
 
-<p>Lets add a fake build task to the gruntfile and pass an array of tasks for it to run before it runs its self.</p>
+<p>Lets add a build task to the gruntfile and pass an array of tasks for it to run first.</p>
 
 <h6>gulpfile.js</h6>
 
@@ -293,9 +322,12 @@ gulp.task('build', ['jscs', 'lint'], function() {
 });
 </code></pre>
 
-<p>This way whenever we run our build task the first thing it will do is run the jscs and lint tasks. If either one of them fails everything will stop right then instead of producing a messed up build. If jscs and lint both pass then the build task will continue running any other tasks you pipe through.</p>
+<p>This way whenever we run our build task the first thing it will do is run the jscs and lint tasks. If either one of them fails everything will stop right then instead of wasting time building or even worse, deploying a messed up build. If jscs and lint both pass then the build task will continue running any other tasks you pipe through.</p>
 
-<p>You may be irritated by getting 3 notifications stacked up. This is because all three tasks are using notifications and all 3 of them passed. If you only plan on running jscs and lint when you run the build task you can remove both of those notifications because you can be sure they passed if you get the final notification from the build task.</p>
+<p>You may not like getting 3 notifications stacked up. This is because all three tasks are using notifications.
+If you only plan on running jscs and lint when you run the build task you can remove both of those
+notifications because you can be sure they passed if you get the final notification from the build task.
+It's up to you.</p>
 
         </div>
                     <p class="tags">
