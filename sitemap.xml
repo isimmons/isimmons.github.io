@@ -7,6 +7,12 @@
     <priority>0.8</priority>
   </url>
     <url>
+    <loc>/blog/2014/02/12/using-jscs-and-jshint-with-gulp</loc>
+    <lastmod>2014-02-12T00:00:00-05:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+    <url>
     <loc>/blog/2013/02/04/highlight</loc>
     <lastmod>2013-02-04T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>

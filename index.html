@@ -46,6 +46,266 @@
                 <div class="span8">
                         <article>
         <header>
+            <h2><a href="/blog/2014/02/12/using-jscs-and-jshint-with-gulp">Using JSCS and JSHint with Gulp</a></h2>
+        </header>
+        <div>
+            <h1>How to use JSCS and JSHint as part of your Gulp build process</h1>
+
+<p>If you are not familiar with JSCS, it is a javascript code style checker. JSCS can be used by the individual developer or by a project lead to enforce coding style for all developer contributions to the project.</p>
+
+<p>I recently became aware of JSCS and its importance while preparing a small and simple pull request for gulp-notify-growl (A gulp package allowing Windows users to use growl notifier). Although my minor code changes were not affected by JSCS, I noticed the project developers use of it and was intrigued because I am a firm believer of enforcing standards.</p>
+
+<p>Yannickcr (the developer of gulp-notify-growl) has an article on his personal website detailing the installation and use of JSCS as a grunt task. https://yannick.cr/posts/enforcing-coding-rules-in-your-team-with-jscs/post . He mentions gulp-jscs in his article.</p>
+
+<p>My goal was to learn how to use both JSCS and JSHint and how to enforce them before other tasks could execute. After some google research and looking at the individual packages gulp-jscs and gulp-jshint this is what I came up with.</p>
+
+<p>First let's build a simple test project.</p>
+
+<p>Start on your desktop or in a projects folder or where ever you like to put your projects and create the following application structure.</p>
+
+<pre><code>    jscstestapp
+    _ js
+    __ app.js
+    package.json
+    gulpfile.js
+</code></pre>
+
+<p>You can use <code>npm init</code> to create your package.json or you can just create it manually containing only the opening and closing curly braces. If you don't have at least the open and close curly braces you will get a parsing error when trying to install packages from the cli. Of course if you use <code>npm-init</code> you won't have to worry about this but then you have to answer those interactive cli questions which are not important for this demonstration. So I'll just manually create the file.</p>
+
+<h6>package.json</h6>
+
+<pre><code class="json">{
+}
+</code></pre>
+
+<p>You will need jscs and jshint installed on your system so in the cli execute
+<code>npm install -g jscs jshint</code></p>
+
+<p>After those packages install, make sure you are in the root of your test app and execute the following.
+<code>npm install --save-dev gulp gulp-jscs gulp-jshint jshint-stylish gulp-notify gulp-notify-growl</code></p>
+
+<p>Really, only gulp and gulp-jscs are required but I like using notify. I will demonstrate how to use regular gulp-notify for Mac/Linux users and how to use gulp-notify-growl for Windows users. I also installed jshint-stylish for use later in the lint task.</p>
+
+<p>Your package.json should now look like this</p>
+
+<pre><code class="json">{
+  "devDependencies": {
+    "gulp-notify-growl": "~0.1.0",
+    "gulp-jscs": "~0.3.0",
+    "gulp": "~3.5.2",
+    "gulp-notify": "~0.4.5",
+    "gulp-jshint": "~1.4.0",
+    "jshint-stylish": "~0.1.5"
+  }
+}
+</code></pre>
+
+<p>Now let's setup our gulpfile with the jscs task</p>
+
+<h6>gulpfile.js</h6>
+
+<pre><code class="javascript">var gulp = require('gulp');
+var notify = require('gulp-notify');
+var growl = require('gulp-notify-growl');
+var jscs = require('gulp-jscs');
+var jshint = require('gulp-jshint');
+
+// For windows users setup a growl notifier
+//var growlNotifier = growl();
+
+gulp.task('jscs', function() {
+    gulp.src('js/*.js')
+        .pipe(jscs())
+        .pipe(notify({
+            title: 'JSCS',
+            message: 'JSCS Passed. Let it fly!'
+        }));
+
+        /* Alternatively for Windows users
+        .pipe(notify({
+            title: 'JSCS',
+            message: 'JSCS Passed. Let it fly!',
+            notifier: growlNotifier
+        }));
+        */
+});
+</code></pre>
+
+<p>We need one more thing for JSCS to work.  <code>.jscs.json</code> is where JSCS will look for the rules you want to enforce. By default JSCS will look in the root of the project for this file.</p>
+
+<p>I took this file directly from the src of Yannick's gulp-notify-growl package but you can modify it however you like for your own projects.</p>
+
+<p>In the root of your project create the file .jscs.json remembering the '.' at the beginning of the file name.</p>
+
+<h6>.jscs.json</h6>
+
+<pre><code class="json">{
+    "requireCurlyBraces": ["if", "else", "for", "while", "do", "try", "catch", "case", "default"],
+    "requireSpaceAfterKeywords": ["if", "else", "for", "while", "do", "switch", "return", "try", "catch"],
+    "requireParenthesesAroundIIFE": true,
+    "requireSpacesInFunctionExpression": { "beforeOpeningCurlyBrace": true },
+    "disallowSpacesInFunctionExpression": { "beforeOpeningRoundBrace": true },
+    "requireMultipleVarDecl": true,
+    "disallowEmptyBlocks": true,
+    "disallowSpacesInsideObjectBrackets": true,
+    "disallowSpacesInsideArrayBrackets": true,
+    "disallowSpacesInsideParentheses": true,
+    "disallowQuotedKeysInObjects": "allButReserved",
+    "requireCommaBeforeLineBreak": true,
+    "requireOperatorBeforeLineBreak": ["?", "+", "-", "/", "*", "=", "==", "===", "!=", "!==", "&gt;", "&gt;=", "&lt;", "&lt;="],
+    "disallowLeftStickedOperators": ["?", "+", "-", "/", "*", "=", "==", "===", "!=", "!==", "&gt;", "&gt;=", "&lt;", "&lt;="],
+    "requireRightStickedOperators": ["!"],
+    "disallowRightStickedOperators": ["?", "+", "/", "*", ":", "=", "==", "===", "!=", "!==", "&gt;", "&gt;=", "&lt;", "&lt;="],
+    "requireLeftStickedOperators": [","],
+    "disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~", "!"],
+    "disallowSpaceBeforePostfixUnaryOperators": ["++", "--"],
+    "requireSpaceBeforeBinaryOperators": ["+", "-", "/", "*", "=", "==", "===", "!=", "!=="],
+    "requireSpaceAfterBinaryOperators": ["+", "-", "/", "*", "=", "==", "===", "!=", "!=="],
+    "disallowKeywords": ["with"],
+    "disallowMultipleLineBreaks": true,
+    "validateLineBreaks": "LF",
+    "validateQuoteMarks": "'",
+    "disallowMixedSpacesAndTabs": true,
+    "disallowTrailingWhitespace": true,
+    "disallowKeywordsOnNewLine": ["else"],
+    "requireLineFeedAtFileEnd": true,
+    "maximumLineLength": 120,
+    "requireCapitalizedConstructors": true,
+    "requireDotNotation": true,
+    "excludeFiles": ["node_modules/**"]
+}
+</code></pre>
+
+<p>As you can see Mr. Yannick has a lot of rules defined here but you can be as strict or relaxed as you like. I just took the easy route of using one someone else already put together.</p>
+
+<p>Now you should be able to run your jscs task but you'll need some code in your app.js file to test.
+For starters I just used this simple code.</p>
+
+<h6>app.js</h6>
+
+<pre><code class="javascript">var Person = {
+  firstName : 'Fred',
+  sayName : function() {
+      console.log('Hello, my name is ' + this.firstName);
+    }
+};
+
+Person.sayName(); //note no blank line at the end of the file
+</code></pre>
+
+<p>Now in the cli exectute</p>
+
+<pre><code>gulp jscs
+</code></pre>
+
+<p>You should see the following result letting you know to put a extra line feed at the end of the file</p>
+
+<pre><code>stream.js:94
+      throw er; // Unhandled stream error in pipe.
+            ^
+[gulp] Error in plugin 'gulp-jscs': Missing line feed at file end at app.js :
+     6 |};
+     7 |
+     8 |Person.sayName();
+--------^
+</code></pre>
+
+<p>The above error listing will be followed by an ugly stacktrace but this is by design. It enforces correction of any rule violations before other tasks can continue such as build or deploy tasks. You can catch the error and deal with it on your own in your gulpfile but I see no problem with leaving it as is.</p>
+
+<h3>JSCS is not a linter</h3>
+
+<p>It is important to understand that JSCS enforces coding style only. For this reason it does not check for missing semicolons and other things that could  cause bugs in certain browsers. Although some rules such as whether to use single or double quotes for strings are available in both, protecting against syntax errors and browser bugs is a job for JSHint.</p>
+
+<p>So lets add a lint task. (I removed the commented out windows growl parts)</p>
+
+<h6>gulpfule.js</h6>
+
+<pre><code class="javascript">var gulp = require('gulp');
+var notify = require('gulp-notify');
+var growl = require('gulp-notify-growl');
+var jscs = require('gulp-jscs');
+var jshint = require('gulp-jshint');
+
+gulp.task('jscs', function() {
+    gulp.src('js/*.js')
+        .pipe(jscs())
+        .pipe(notify({
+            title: 'JSCS',
+            message: 'JSCS Passed. Let it fly!'
+        }));
+});
+
+gulp.task('lint', function() {
+    gulp.src('js/*.js')
+        .pipe(jshint('.jshintrc'))
+        .pipe(jshint.reporter('jshint-stylish'))
+        .pipe(jshint.reporter('fail'))
+        .pipe(notify({
+            title: 'JSHint',
+            message: 'JSHint Passed. Let it fly!',
+        }))
+});
+</code></pre>
+
+<p>gulp-jshint requires a reporter to be defined. You can use 'jshint-stylish' (requires installation of the jshint-stylish package) or just stick with the 'default' reporter. jshint-stylish works on Windows if you are using a color supporting console emulator such as conemu, and it just looks prettier with colors.</p>
+
+<p>gulp-jshint will not fail by default like gulp-jscs does so after reporting you must pipe it through a second reporter with the type set as 'fail'. Just like with gulp-jscs you could catch the error and handle it with your own custom handler but I like that it completely fails when there is a problem.</p>
+
+<h3>Enforcing JSCS and JShint before build or deploy tasks</h3>
+
+<p>Lets say you are using gulp-git to commit changes to the repository or you have a custom build or deploy task and you want to make sure JSCS and JSHint tests pass before this task will run.</p>
+
+<p>Lets add a fake build task to the gruntfile and pass an array of tasks for it to run before it runs its self.</p>
+
+<h6>gulpfile.js</h6>
+
+<pre><code class="javascript">var gulp = require('gulp');
+var notify = require('gulp-notify');
+var growl = require('gulp-notify-growl');
+var jscs = require('gulp-jscs');
+var jshint = require('gulp-jshint');
+
+gulp.task('jscs', function() {
+    gulp.src('js/*.js')
+        .pipe(jscs())
+        .pipe(notify({
+            title: 'JSCS',
+            message: 'JSCS Passed. Let it fly!'
+        }));
+});
+
+gulp.task('lint', function() {
+    gulp.src('js/*.js')
+        .pipe(jshint('.jshintrc'))
+        .pipe(jshint.reporter('jshint-stylish'))
+        .pipe(jshint.reporter('fail'))
+        .pipe(notify({
+            title: 'JSHint',
+            message: 'JSHint Passed. Let it fly!',
+        }))
+});
+
+gulp.task('build', ['jscs', 'lint'], function() {
+    gulp.src('/')
+        //pipe through other tasks such as sass or coffee compile tasks
+        .pipe(notify({
+            title: 'Task Builder',
+            message: 'Successfully built application'
+        }))
+});
+</code></pre>
+
+<p>This way whenever we run our build task the first thing it will do is run the jscs and lint tasks. If either one of them fails everything will stop right then instead of producing a messed up build. If jscs and lint both pass then the build task will continue running any other tasks you pipe through.</p>
+
+<p>You may be irritated by getting 3 notifications stacked up. This is because all three tasks are using notifications and all 3 of them passed. If you only plan on running jscs and lint when you run the build task you can remove both of those notifications because you can be sure they passed if you get the final notification from the build task.</p>
+
+        </div>
+                    <p class="tags">
+            Tags:
+                        <a href="/blog/tags/gulp">gulp</a>,                         <a href="/blog/tags/jscs">jscs</a>,                         <a href="/blog/tags/jshint">jshint</a>                        </p>
+            </article>
+    <article>
+        <header>
             <h2><a href="/blog/2013/02/04/highlight">Syntax Highlighting</a></h2>
         </header>
         <div>
@@ -102,55 +362,6 @@ find.</p>
                     <p class="tags">
             Tags:
                         <a href="/blog/tags/drafts">drafts</a>                        </p>
-            </article>
-    <article>
-        <header>
-            <h2><a href="/blog/2012/11/27/lorem-ipsum">Lorem Ipsum</a></h2>
-        </header>
-        <div>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin consequat congue
-lacus vel convallis. Cras nisi urna, ultrices non semper quis, ultricies sit
-amet est. Donec nunc velit, consequat a pulvinar a, eleifend id leo. Curabitur
-vel leo eros, vitae elementum purus. Integer id lorem hendrerit purus gravida
-commodo. Pellentesque nec rhoncus turpis. Cras feugiat odio eget quam semper at
-dictum lectus adipiscing. In ut est et mauris pulvinar placerat eget fringilla
-lectus.</p>
-
-<p>Ut in mauris augue, vitae facilisis purus. Nam ullamcorper pharetra lorem,
-cursus lobortis tellus facilisis congue. Etiam ac dapibus lectus. Nunc tempus
-ullamcorper felis, eu sagittis risus mollis aliquam. Mauris congue orci ac metus
-egestas porta nec ac lectus. Nam ac neque vitae quam sagittis dapibus. Morbi sit
-amet erat ac justo rutrum molestie id in tortor. Proin egestas tortor neque,
-eget fringilla nunc. Donec consequat purus ac risus dignissim dignissim.
-Praesent dui nisl, suscipit sed cursus in, dictum non elit. Nulla eget congue
-nisl.</p>
-
-<p>Morbi hendrerit porta ante, dapibus adipiscing nibh ornare at. Nullam iaculis
-porta ante, at semper tellus auctor nec. Vestibulum nec justo sed purus
-elementum venenatis. In hac habitasse platea dictumst. Fusce nibh tellus, varius
-non commodo sit amet, eleifend placerat nisl. Donec sit amet enim cursus ligula
-adipiscing auctor. Nullam sagittis porta ligula vitae rutrum. Aenean id sapien
-mi, elementum ullamcorper lectus. Aliquam erat volutpat. Fusce bibendum, leo
-ultricies lacinia viverra, mauris urna fermentum sem, id tempus lectus nunc
-faucibus magna. Vestibulum risus mi, tempus ut lobortis non, mattis sed diam.
-Nunc at mattis leo.</p>
-
-<p>Ut erat nunc, vestibulum sit amet sodales non, tincidunt nec justo. Integer
-vitae tortor massa. Vestibulum tincidunt commodo lacus, ac cursus lorem mattis
-eu. Donec ut magna vel urna fermentum congue. Donec laoreet neque at velit
-imperdiet luctus. In consectetur lacus eu purus dictum a imperdiet leo
-ullamcorper. Phasellus consequat feugiat tincidunt. Quisque vel orci in mauris
-fermentum pretium.</p>
-
-<p>Pellentesque rhoncus accumsan auctor. Nunc venenatis tellus non ante pharetra
-pretium. Sed rutrum, eros eu tristique luctus, neque sapien ultrices felis, id
-varius orci erat eget leo. Curabitur ut volutpat diam. Phasellus porta neque
-vitae nisi sodales ultrices. Etiam ultricies blandit lorem, id accumsan eros
-facilisis vel. Praesent nulla sapien, laoreet sit amet dapibus sit amet,
-tincidunt vitae neque. Vestibulum aliquam sollicitudin urna, in facilisis dui
-aliquam id.</p>
-
-        </div>
             </article>
     <nav>
         <br />
