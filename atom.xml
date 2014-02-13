@@ -3,7 +3,7 @@
     <title><![CDATA[isimmons.github.io]]></title>
     <link href="/atom.xml" rel="self"/>
     <link href="/"/>
-    <updated>2014-02-12T21:44:31-05:00</updated>
+    <updated>2014-02-12T22:27:50-05:00</updated>
     <id>/</id>
         <generator uri="http://sculpin.io/">Sculpin</generator>
             <entry>
@@ -35,12 +35,12 @@
 
 <p>You will need jscs and jshint installed on your system so in the cli execute</p>
 
-<pre><code>npm install -g jscs jshint
+<pre><code class="javascript">npm install -g jscs jshint
 </code></pre>
 
 <p>After those packages finish installing, make sure you are in the root of your test app and execute the following.</p>
 
-<pre><code>npm install --save-dev gulp gulp-jscs gulp-jshint jshint-stylish gulp-notify gulp-notify-growl
+<pre><code class="javascript">npm install --save-dev gulp gulp-jscs gulp-jshint jshint-stylish gulp-notify gulp-notify-growl
 </code></pre>
 
 <p>Only gulp, gulp-jscs, and gulp-jshint are required but I like notifications. I will demonstrate how to use regular gulp-notify for Mac/Linux users and how to use gulp-notify-growl for Windows users. I also installed jshint-stylish for use later in the lint task.</p>
@@ -156,7 +156,7 @@ Person.sayName(); //note no blank line at the end of the file
 
 <p>Now in the cli exectute</p>
 
-<pre><code>gulp jscs
+<pre><code class="javascript">gulp jscs
 </code></pre>
 
 <p>You should see the following result letting you know to put a extra line feed at the end of the file</p>
@@ -290,6 +290,10 @@ gulp.task('build', ['jscs', 'lint'], function() {
 If you only plan on running jscs and lint when you run the build task you can remove both of those
 notifications because you can be sure they passed if you get the final notification from the build task.
 It's up to you.</p>
+
+<p>Hopefully this is helpful to you. Let me know in the comments if you have any issues or anything to add.</p>
+
+<p>Thanks for reading.</p>
 ]]></content>
         </entry>
     </feed>
