@@ -1,4 +1,4 @@
-added app permission to this repo
+deploy workflow needed env with token
 
 # Astro Starter Kit: Minimal
 
