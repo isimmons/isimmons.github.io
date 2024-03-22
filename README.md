@@ -1,3 +1,5 @@
+# may not work because studio login needed
+
 # Astro Starter Kit: Minimal
 
 ```sh
