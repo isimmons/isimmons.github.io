@@ -1,4 +1,4 @@
-# may not work because studio login needed
+added app permission to this repo
 
 # Astro Starter Kit: Minimal
 
