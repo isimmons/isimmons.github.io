@@ -6,12 +6,12 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro check && astro build --remote",
+    "build:local": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/db": "^0.9.3",
-    "@astrojs/node": "^8.2.5",
     "astro": "^4.5.8"
   },
   "devDependencies": {
